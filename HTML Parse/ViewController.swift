@@ -38,20 +38,30 @@ class ViewController: UIViewController {
         do {
             var topPosts = ""
             
+            //Create Document Element
             let doc: Document = try SwiftSoup.parse(html)
             
-            let posts = try doc.getElementById("siteTable")?.getChildNodes()
+            let redditPosts: Elements = try doc.select("div[id^=thing_]")
+            let titles: Elements = try redditPosts.select("a[data-event-action=title]")
+            
+            for title: Element in titles {
+                topPosts += try title.html() + "\n\n"
+            }
+            
+            /*let posts = try doc.getElementById("siteTable")?.getChildNodes()
             
             for post in posts! {
                 if try !post.attr("id").isEmpty {
                     try topPosts += (post.childNode(4).childNode(0).childNode(0).childNode(0).childNode(0).outerHtml()) + "\n\n"
                 }
-            }
+            }*/
+            
             textView.text = topPosts
-        } catch Exception.Error(let type, let message) {
+        } catch Exception.Error(let message) {
             print(message)
+            textView.text = "Error Loading Results"
         } catch {
-            print("error")
+            textView.text = "Error Loading Results"
         }
     }
 }
